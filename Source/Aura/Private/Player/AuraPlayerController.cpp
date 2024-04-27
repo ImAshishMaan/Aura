@@ -33,13 +33,13 @@ void AAuraPlayerController::SetupInputComponent() {
 
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
 
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, FName("Move"));
+	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAuraPlayerController::Move);
 	
 }
 
-void AAuraPlayerController::Move(const FInputActionValue* InputActionValue) {
+void AAuraPlayerController::Move(const FInputActionValue& InputActionValue) {
 
-	const FVector2D InputAxisVector = InputActionValue->Get<FVector2D>();
+	const FVector2D InputAxisVector = InputActionValue.Get<FVector2D>();
 	const FRotator Rotation = GetControlRotation();
 	const FRotator YawRotation(0.f, Rotation.Yaw,0.f);
 
