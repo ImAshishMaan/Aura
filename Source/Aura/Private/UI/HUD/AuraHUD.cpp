@@ -3,14 +3,11 @@
 #include "UI/WidgetController/OverlayWidgetController.h"
 
 UOverlayWidgetController* AAuraHUD::GetOverlayWidgetController(const FWidgetControllerParams& WCParams) {
-
 	if(OverlayWidgetController == nullptr) {
 		OverlayWidgetController = NewObject<UOverlayWidgetController>(this, OverlayWidgetControllerClass);
 		OverlayWidgetController->SetWidgetControllerParams(WCParams);
-
-		return OverlayWidgetController;
+		OverlayWidgetController->BindCallbacksToDependencies();
 	}
-
 	return OverlayWidgetController;
 }
 
@@ -26,7 +23,8 @@ void AAuraHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySyst
 	UOverlayWidgetController* WidgetController = GetOverlayWidgetController(WidgetControllerParams);
 	
 	OverlayWidget->SetWidgetController(WidgetController);
-
+	WidgetController->BroadcastInitialValues(); // Setting initial values.
+	
 	Widget->AddToViewport();
 	
 }
