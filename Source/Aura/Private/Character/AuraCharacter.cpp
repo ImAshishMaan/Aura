@@ -49,7 +49,7 @@ void AAuraCharacter::InitAbilityActorInfo() {
 	if(AAuraPlayerController* AuraPlayerController = Cast<AAuraPlayerController>(GetController())) {
 		if(AAuraHUD* AuraHUD = Cast<AAuraHUD>(AuraPlayerController->GetHUD())) {
 			AuraHUD->InitOverlay(AuraPlayerController, AuraPlayerState, AbilitySystemComponent, AttributeSet);
-			
 		}
 	}
+	InitializePrimaryAttributes();
 }
