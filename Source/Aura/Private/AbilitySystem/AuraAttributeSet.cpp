@@ -7,16 +7,19 @@
 
 
 UAuraAttributeSet::UAuraAttributeSet() {
-
 	InitHealth(30);
 	InitMaxHealth(100);
 	InitMana(10);
 	InitMaxMana(50);
-	
 }
 
 void UAuraAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION_NOTIFY(UAuraAttributeSet, Strength, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UAuraAttributeSet, Intelligence, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UAuraAttributeSet, Resilience, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UAuraAttributeSet, Vigor, COND_None, REPNOTIFY_Always);
 
 	DOREPLIFETIME_CONDITION_NOTIFY(UAuraAttributeSet, Health, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UAuraAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
@@ -33,7 +36,6 @@ void UAuraAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, 
 	if(Attribute == GetManaAttribute()) {
 		NewValue = FMath::Clamp(NewValue, 0, GetMaxMana());
 	}
-	
 }
 
 void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) {
@@ -42,10 +44,10 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	FEffectProperties Props;
 	SetEffectProperties(Data, Props);
 
-	if (Data.EvaluatedData.Attribute == GetHealthAttribute()) {
+	if(Data.EvaluatedData.Attribute == GetHealthAttribute()) {
 		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
 	}
-	if (Data.EvaluatedData.Attribute == GetManaAttribute()) {
+	if(Data.EvaluatedData.Attribute == GetManaAttribute()) {
 		SetMana(FMath::Clamp(GetMana(), 0.f, GetMaxMana()));
 	}
 }
@@ -72,28 +74,40 @@ void UAuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData
 	Props.EffectContextHandle = Data.EffectSpec.GetContext();
 	Props.SourceASC = Props.EffectContextHandle.GetOriginalInstigatorAbilitySystemComponent();
 
-	if (IsValid(Props.SourceASC) && Props.SourceASC->AbilityActorInfo.IsValid() && Props.SourceASC->AbilityActorInfo->AvatarActor.IsValid())
-	{
+	if(IsValid(Props.SourceASC) && Props.SourceASC->AbilityActorInfo.IsValid() && Props.SourceASC->AbilityActorInfo->
+		AvatarActor.IsValid()) {
 		Props.SourceAvatarActor = Props.SourceASC->AbilityActorInfo->AvatarActor.Get();
 		Props.SourceController = Props.SourceASC->AbilityActorInfo->PlayerController.Get();
-		if (Props.SourceController == nullptr && Props.SourceAvatarActor != nullptr)
-		{
-			if (const APawn* Pawn = Cast<APawn>(Props.SourceAvatarActor))
-			{
+		if(Props.SourceController == nullptr && Props.SourceAvatarActor != nullptr) {
+			if(const APawn* Pawn = Cast<APawn>(Props.SourceAvatarActor)) {
 				Props.SourceController = Pawn->GetController();
 			}
 		}
-		if (Props.SourceController)
-		{
+		if(Props.SourceController) {
 			ACharacter* SourceCharacter = Cast<ACharacter>(Props.SourceController->GetPawn());
 		}
 	}
 
-	if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->AvatarActor.IsValid())
-	{
+	if(Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->AvatarActor.IsValid()) {
 		Props.TargetAvatarActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
 		Props.TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
 		Props.TargetCharacter = Cast<ACharacter>(Props.TargetAvatarActor);
 		Props.TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Props.TargetAvatarActor);
 	}
+}
+
+void UAuraAttributeSet::OnRep_Strength(const FGameplayAttributeData& OldStrength) const {
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UAuraAttributeSet, Strength, OldStrength);
+}
+
+void UAuraAttributeSet::OnRep_Intelligence(const FGameplayAttributeData& OldIntelligence) const {
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UAuraAttributeSet, Intelligence, OldIntelligence);
+}
+
+void UAuraAttributeSet::OnRep_Resilience(const FGameplayAttributeData& OldResilience) const {
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UAuraAttributeSet, Resilience, OldResilience);
+}
+
+void UAuraAttributeSet::OnRep_Vigor(const FGameplayAttributeData& OldVigor) const {
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UAuraAttributeSet, Vigor, OldVigor);
 }
